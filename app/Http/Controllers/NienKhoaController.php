@@ -13,7 +13,7 @@ public function createData(Request $request){
     return response()->json([
         'status'        => 1,
         'message'       => "Đã thêm niên khóa thành công!",
-        // 'data'       => $request->all(),
+         'data'       => $request->all(),
     ]);
 }
 public function getData(){
@@ -30,7 +30,7 @@ public function updateData(Request $request)
             $nien_khoa->update($request->all());
             return response()->json([
                 'status'    => 1,
-                'message'   => 'Đã cập nhật  niên khóa thành công!',
+                'message'   => 'Đã cập nhật niên khóa thành công!',
             ]);
         } else {
             return response()->json([
