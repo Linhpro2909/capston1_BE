@@ -27,10 +27,12 @@ Route::group([],function() {
          Route::get('/data', [NienKhoaController::class, 'getData']);
          Route::post('/create', [NienKhoaController::class, 'createData']);
          Route::post('/update', [NienKhoaController::class, 'updateData']);
+         Route::post('/delete', [NienKhoaController::class, 'deleteData']);
+         Route::post('/search', [NienKhoaController::class, 'searchData']);
     });
     Route::group(['prefix'  => '/sinh-vien'], function() {
         Route::get('/data', [SinhVienController::class, 'getData']);
-        Route::get('/data/{id}', [SinhVienController::class, 'getDataid']);
+        // Route::get('/data/{id}', [SinhVienController::class, 'getDataid']);
         Route::post('/create', [SinhVienController::class, 'createData']);
         Route::post('/update', [SinhVienController::class, 'updateData']);
     });
@@ -39,5 +41,11 @@ Route::group([],function() {
         Route::post('/create', [GiangVienController::class,'createData']);
         Route::post('/update',[GiangVienController::class,'updateData']);
     });
+    Route::post('register', 'AuthController@register');
+    Route::post('login', 'AuthController@login');
+        Route::group(['middleware' => 'jwt'], function () {
+            Route::post('logout', 'AuthController@logout');
+            // Các tài nguyên cần xác thực
+        });
 });
 

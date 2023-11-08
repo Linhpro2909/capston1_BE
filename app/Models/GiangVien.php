@@ -14,5 +14,6 @@ class GiangVien extends Model
         'Date_of_birth',
         'Address',
         'don_vi_cong_tac',
+        'ma_giang_vien'
     ];
 }

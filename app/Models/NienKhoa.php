@@ -14,5 +14,6 @@ class NienKhoa extends Model
         'thoi_gian_bat_dau',
         'thoi_gian_ket_thuc',
         'tinh_trang',
+        'ma_nien_khoa'
     ];
 }
