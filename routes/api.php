@@ -5,7 +5,7 @@ use App\Http\Controllers\KhoaHocController;
 use App\Http\Controllers\NienKhoaController;
 use App\Http\Controllers\SinhVienController;
 use App\Http\Controllers\GiangVienController;
-use App\Http\Controllers\AuthControllerController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -42,11 +42,29 @@ Route::group([],function() {
         Route::post('/create', [GiangVienController::class,'createData']);
         Route::post('/update',[GiangVienController::class,'updateData']);
     });
-    Route::post('register',  [AuthControllerController::class,'register']);
-    Route::post('login', [AuthControllerController::class,'login']);
-        Route::group(['middleware' => 'jwt'], function () {
-            Route::post('logout', [AuthControllerController::class,'logout']);
-            // Các tài nguyên cần xác thực
-        });
+    
 });
+// Route::group([
+ 
+//     'middleware' => 'api',
+//     'prefix' => 'auth'
+ 
+// ], function ($router) {
+//     Route::post('/register', [AuthController::class, 'register'])->name('register');
+//     Route::post('/login', [AuthController::class, 'login'])->name('login');
+//     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+//     Route::post('/refresh', [AuthController::class, 'refresh'])->name('refresh');
+//     Route::post('/me', [AuthController::class, 'me'])->name('me');
+// });
 
+//API route để đăng ký
+Route::post('/register', [AuthController::class, 'register']);
+//API route để đăng nhập
+Route::post('/login', [AuthController::class, 'login']);
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/profile', function(Request $request) { 
+        return auth()->user();
+    });
+    // API route thoát
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
