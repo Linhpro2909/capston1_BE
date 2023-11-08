@@ -5,6 +5,7 @@ use App\Http\Controllers\KhoaHocController;
 use App\Http\Controllers\NienKhoaController;
 use App\Http\Controllers\SinhVienController;
 use App\Http\Controllers\GiangVienController;
+use App\Http\Controllers\AuthControllerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,10 +42,10 @@ Route::group([],function() {
         Route::post('/create', [GiangVienController::class,'createData']);
         Route::post('/update',[GiangVienController::class,'updateData']);
     });
-    Route::post('register', 'AuthController@register');
-    Route::post('login', 'AuthController@login');
+    Route::post('register',  [AuthControllerController::class,'register']);
+    Route::post('login', [AuthControllerController::class,'login']);
         Route::group(['middleware' => 'jwt'], function () {
-            Route::post('logout', 'AuthController@logout');
+            Route::post('logout', [AuthControllerController::class,'logout']);
             // Các tài nguyên cần xác thực
         });
 });
