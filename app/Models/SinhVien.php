@@ -14,5 +14,6 @@ class SinhVien extends Model
         'ma_sinh_vien',
         'so_dien_thoai',
         'diem_gpa',
+        'id_nien_khoa',
     ];
 }

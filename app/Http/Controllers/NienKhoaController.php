@@ -39,4 +39,29 @@ public function updateData(Request $request)
             ]);
         }
 }
+public function deleteData(Request $request)
+{
+   $nien_khoa     = NienKhoa::where('id', $request->id)->first();
+    if ($nien_khoa) {
+       $nien_khoa->delete();
+        return response()->json([
+            'status'    => 1,
+            'message'   => 'Đã xóa thành công!',
+        ]);
+    } else {
+        return response()->json([
+            'status'    => 0,
+            'message'   => 'không tồn tại!',
+        ]);
+    }
+}
+public function searchData(Request $request)
+{
+    $ten_can_tim    = '%' . $request->ten_nien_khoa . '%';
+    $data   = NienKhoa::where('ten_nien_khoa', 'like', $ten_can_tim)->get();
+
+    return response()->json([
+        'data'          => $data,
+    ]);
+}
 }
