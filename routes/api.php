@@ -6,6 +6,7 @@ use App\Http\Controllers\NienKhoaController;
 use App\Http\Controllers\SinhVienController;
 use App\Http\Controllers\GiangVienController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DeTaiSinhVienController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,17 +34,29 @@ Route::group([],function() {
     });
     Route::group(['prefix'  => '/sinh-vien'], function() {
         Route::get('/data', [SinhVienController::class, 'getData']);
-        // Route::get('/data/{id}', [SinhVienController::class, 'getDataid']);
         Route::post('/create', [SinhVienController::class, 'createData']);
         Route::post('/update', [SinhVienController::class, 'updateData']);
+        Route::post('/delete', [SinhVienController::class, 'deleteData']);
+        Route::post('/search', [SinhVienController::class, 'searchData']);
     });
     Route::group(['prefix' => '/giang-vien'], function(){
         Route::get('/data', [GiangVienController::class,'getData']);
         Route::post('/create', [GiangVienController::class,'createData']);
         Route::post('/update',[GiangVienController::class,'updateData']);
+        Route::post('/delete', [GiangVienController::class, 'deleteData']);
+        Route::post('/search', [GiangVienController::class, 'searchData']);
     });
-    
+    Route::group(['prefix'  => '/de-tai-sinh-vien'], function() {
+        Route::get('/data', [DeTaiSinhVienController::class, 'getData']);
+        Route::post('/create', [DeTaiSinhVienController::class, 'createData']);
+        Route::post('/update', [DeTaiSinhVienController::class, 'updateData']);
+        Route::post('/delete', [DeTaiSinhVienController::class, 'deleteData']);
+        Route::post('/search', [DeTaiSinhVienController::class, 'searchData']);
+        Route::post('/trang-thai',[DeTaiSinhVienController::class,'trangthai']);
+        Route::post('/trang-thai-1',[DeTaiSinhVienController::class,'trangthai1']);
+    });
 });
+
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'

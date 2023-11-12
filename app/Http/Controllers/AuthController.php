@@ -1,15 +1,15 @@
 <?php
- 
+
 namespace App\Http\Controllers;
- 
+
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
- 
- 
+
+
 class AuthController extends Controller
 {
     /**
@@ -21,32 +21,19 @@ class AuthController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['login', 'register','profilelist']]);
     }
- 
- 
+
+
     /**
      * Register a User.
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request) {
-        // $validator = Validator::make($request->all(),[
-        //    'MSSV' => 'required|max:255',
-        //    'email' => 'required|string|email|max:255|unique:users',
-        //    'password' => 'required|string|min:8'
-        // ]);
-        // if($validator->fails())return response()->json($validator->errors());
-        // $user = User::create([
-        //    'MSSV' => $request->MSSV,
-        //    'email' => $request->email,
-        //    'password' => Hash::make($request->password)
-        // ]);
-        // $token = $user->createToken('auth_token')->plainTextToken;
-        // return response()->json(
-        // ['data' => $user,'access_token' => $token, 'token_type' => 'Bearer', ]);
-        $validator = Validator::make($request->all(), [
-            'MSSV' => 'required',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|min:6',
+        $validator = Validator::make($request->all(),[
+           'MSSV' => 'required|max:255',
+           'email' => 'required|string|email|max:255|unique:users',
+           'password' => 'required|string|min:8'
+
         ]);
         if($validator->fails()){
             return response()->json($validator->errors()->toJson(), 400);
@@ -60,8 +47,8 @@ class AuthController extends Controller
             'user' => $user
         ], 201);
       }
- 
- 
+
+
     /**
      * Get a JWT via given credentials.
      *
@@ -116,27 +103,35 @@ class AuthController extends Controller
                 ]);
             }
     }
+
+   
+
+
     /**
      * Get the authenticated User.
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
     public function userProfile() {
         return response()->json(auth('api')->user());
     }
  
+
+
     // /**
     //  * Log the user out (Invalidate the token).
     //  *
     //  * @return \Illuminate\Http\JsonResponse
     //  */
-    
- 
+
+
     // /**
     //  * Refresh a token.
     //  *
     //  * @return \Illuminate\Http\JsonResponse
     //  */
+
     
  
     public function refresh() {

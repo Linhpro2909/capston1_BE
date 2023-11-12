@@ -23,23 +23,23 @@ class SinhVienController extends Controller
             'data'      => $data,
         ]);
     }
-    public function getDataid(){
-        $datadetail =SinhVien::where('id', $request->id)->first();
-        if ($datadetail) {
-            $datadetail->get($request->all());
-            return response()->json([
-                'status'    => 1,
-                'message'   => 'Đã lấy chi tiết sinh viên thành công!',
-                'data'      => $data,
-                
-            ]);
-        } else {
-            return response()->json([
-                'status'    => 0,
-                'message'   => 'Lấy chi tiết sinh viên thất bại',
-            ]);
-        }
-    }
+    // public function getDataid(){
+    //     $datadetail =SinhVien::where('id', $request->id)->first();
+    //     if ($datadetail) {
+    //         $datadetail->get($request->all());
+    //         return response()->json([
+    //             'status'    => 1,
+    //             'message'   => 'Đã lấy chi tiết sinh viên thành công!',
+    //             'data'      => $data,
+
+    //         ]);
+    //     } else {
+    //         return response()->json([
+    //             'status'    => 0,
+    //             'message'   => 'Lấy chi tiết sinh viên thất bại',
+    //         ]);
+    //     }
+    // }
     public function updateData(Request $request)
 {
     $sinh_vien  = SinhVien::where('id', $request->id)->first();
@@ -48,7 +48,7 @@ class SinhVienController extends Controller
             return response()->json([
                 'status'    => 1,
                 'message'   => 'Đã cập nhật thành công!',
-                
+
             ]);
         } else {
             return response()->json([
@@ -56,5 +56,47 @@ class SinhVienController extends Controller
                 'message'   => 'Sinh viên không tồn tại',
             ]);
         }
+}
+public function deleteData(Request $request)
+{
+
+    $data = $request->all();
+
+    $str = "";
+
+    foreach ($data as $key => $value) {
+        if (isset($value['check'])) {
+            $str .= $value['id'] . ",";
+        }
+
+        $data_id = explode(",", rtrim($str, ","));
+
+        foreach ($data_id as $k => $v) {
+            $sinh_vien = SinhVien::where('id', $v);
+
+            if ($sinh_vien) {
+                $sinh_vien->delete();
+            } else {
+                return response()->json([
+                    'status'    => false,
+                    'message'   => 'Đã có lỗi sự cố!',
+                ]);
+            }
+        }
+    }
+
+    return response()->json([
+        'status'    => true,
+        'message'   => 'Đã xóa thành công!',
+    ]);
+}
+public function searchData(Request $request)
+{
+    $ten_can_tim    = '%' . $request->ten_sinh_vien . '%';
+    $data   = SinhVien::where('ten_sinh_vien', 'like', $ten_can_tim)->get();
+
+    return response()->json([
+        'data'          => $data,
+    ]);
 }
 }

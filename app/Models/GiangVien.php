@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class GiangVien extends Model
 {
     use HasFactory;
-    protected $table='GiangVien';
+    protected $table='giang_viens';
     protected $fillable=[
-        'Name',
-        'Date_of_birth',
-        'Address',
-        'don_vi_cong_tac',
-        'ma_giang_vien'
+        'ma_giang_vien',
+        'ten_giang_vien',
+        'ngay_thang_nam_sinh',
+        'dia_chi',
+        'dia_chi_cong_tac',
     ];
 }
