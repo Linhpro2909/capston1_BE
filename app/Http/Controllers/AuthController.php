@@ -1,15 +1,15 @@
 <?php
- 
+
 namespace App\Http\Controllers;
- 
+
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
- 
- 
+
+
 class AuthController extends Controller
 {
     /**
@@ -21,15 +21,15 @@ class AuthController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
- 
- 
+
+
     /**
      * Register a User.
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request) {
-        $validator = \Validator::make($request->all(),[
+        $validator = Validator::make($request->all(),[
            'MSSV' => 'required|max:255',
            'email' => 'required|string|email|max:255|unique:users',
            'password' => 'required|string|min:8'
@@ -44,8 +44,8 @@ class AuthController extends Controller
         return response()->json(
         ['data' => $user,'access_token' => $token, 'token_type' => 'Bearer', ]);
       }
- 
- 
+
+
     /**
      * Get a JWT via given credentials.
      *
@@ -63,8 +63,8 @@ class AuthController extends Controller
     public function logout()  {
         auth()->user()->tokens()->delete();
         return ['message' => 'Bạn đã thoát ứng dụng và token đã xóa'];
-    }    
- 
+    }
+
     /**
      * Get the authenticated User.
      *
@@ -74,14 +74,14 @@ class AuthController extends Controller
     // {
     //     return response()->json(auth()->user());
     // }
- 
+
     // /**
     //  * Log the user out (Invalidate the token).
     //  *
     //  * @return \Illuminate\Http\JsonResponse
     //  */
-    
- 
+
+
     // /**
     //  * Refresh a token.
     //  *
@@ -91,7 +91,7 @@ class AuthController extends Controller
     // {
     //     return $this->respondWithToken(auth()->refresh());
     // }
- 
+
     // /**
     //  * Get the token array structure.
     //  *
