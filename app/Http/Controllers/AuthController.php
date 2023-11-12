@@ -19,7 +19,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register','profilelist']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register','profilelist','update']]);
     }
 
 
@@ -89,7 +89,8 @@ class AuthController extends Controller
     }
     public function update(Request $request)
     {
-        $user = User::findOrFail($request->id);
+        $user= User::where('id', $request->id)->first();
+        // $user = User::findOrFail($request->id);
             if (!$user) {
                 return response()->json([
                     'status'    => 0,
