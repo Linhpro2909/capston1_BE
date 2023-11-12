@@ -19,7 +19,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register','profilelist']]);
     }
  
  
@@ -29,20 +29,36 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request) {
-        $validator = \Validator::make($request->all(),[
-           'MSSV' => 'required|max:255',
-           'email' => 'required|string|email|max:255|unique:users',
-           'password' => 'required|string|min:8'
+        // $validator = Validator::make($request->all(),[
+        //    'MSSV' => 'required|max:255',
+        //    'email' => 'required|string|email|max:255|unique:users',
+        //    'password' => 'required|string|min:8'
+        // ]);
+        // if($validator->fails())return response()->json($validator->errors());
+        // $user = User::create([
+        //    'MSSV' => $request->MSSV,
+        //    'email' => $request->email,
+        //    'password' => Hash::make($request->password)
+        // ]);
+        // $token = $user->createToken('auth_token')->plainTextToken;
+        // return response()->json(
+        // ['data' => $user,'access_token' => $token, 'token_type' => 'Bearer', ]);
+        $validator = Validator::make($request->all(), [
+            'MSSV' => 'required',
+            'email' => 'required|string|email|max:100|unique:users',
+            'password' => 'required|string|min:6',
         ]);
-        if($validator->fails())return response()->json($validator->errors());
-        $user = User::create([
-           'MSSV' => $request->MSSV,
-           'email' => $request->email,
-           'password' => Hash::make($request->password)
-        ]);
-        $token = $user->createToken('auth_token')->plainTextToken;
-        return response()->json(
-        ['data' => $user,'access_token' => $token, 'token_type' => 'Bearer', ]);
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+        $user = User::create(array_merge(
+                    $validator->validated(),
+                    ['password' => bcrypt($request->password)]
+                ));
+        return response()->json([
+            'message' => 'User successfully registered',
+            'user' => $user
+        ], 201);
       }
  
  
@@ -52,28 +68,62 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request) {
-        if (!Auth::attempt($request->only('MSSV', 'password')))  {
-           return response()->json(['message' => 'Unauthorized'], 401);
+        // if (!Auth::attempt($request->only('MSSV', 'password')))  {
+        //    return response()->json(['message' => 'Unauthorized'], 401);
+        // }
+        // $user = User::where('MSSV', $request['MSSV'])->firstOrFail();
+        // $token = $user->createToken('auth_token')->plainTextToken;
+        // return response()->json(['message' => 'Chào '.$user->name.'! Chúc an lành',
+        //    'access_token' => $token, 'token_type' => 'Bearer',]);
+        $validator = Validator::make($request->all(), [
+            'MSSV' => 'required',
+            // 'email' => 'required|email',
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
         }
-        $user = User::where('MSSV', $request['MSSV'])->firstOrFail();
-        $token = $user->createToken('auth_token')->plainTextToken;
-        return response()->json(['message' => 'Chào '.$user->name.'! Chúc an lành',
-           'access_token' => $token, 'token_type' => 'Bearer',]);
+        if (! $token = auth('api')->attempt($validator->validated())) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        return $this->createNewToken($token);
     }
-    public function logout()  {
-        auth()->user()->tokens()->delete();
-        return ['message' => 'Bạn đã thoát ứng dụng và token đã xóa'];
-    }    
- 
+    public function logout() {
+        auth()->logout();
+        return response()->json(['message' => 'User successfully signed out']);
+    }  
+    public function profilelist()  {
+        $user = User::get();
+        if(!$user){
+            return ['message' => 'Thất bại'];
+        }
+        
+        return response()->json(['data' => $user, 'message' => 'Thành công'], 200);
+    }
+    public function update(Request $request)
+    {
+        $user = User::findOrFail($request->id);
+            if (!$user) {
+                return response()->json([
+                    'status'    => 0,
+                    'message'   => 'tài khoản không tồn tại',
+                ]);
+            } else {
+                $user->update($request->all());
+                return response()->json([
+                    'status'    => 1,
+                    'message'   => 'Đã cập nhật tài khoản thành công!',
+                ]);
+            }
+    }
     /**
      * Get the authenticated User.
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    // public function me()
-    // {
-    //     return response()->json(auth()->user());
-    // }
+    public function userProfile() {
+        return response()->json(auth('api')->user());
+    }
  
     // /**
     //  * Log the user out (Invalidate the token).
@@ -87,25 +137,17 @@ class AuthController extends Controller
     //  *
     //  * @return \Illuminate\Http\JsonResponse
     //  */
-    // public function refresh()
-    // {
-    //     return $this->respondWithToken(auth()->refresh());
-    // }
+    
  
-    // /**
-    //  * Get the token array structure.
-    //  *
-    //  * @param  string $token
-    //  *
-    //  * @return \Illuminate\Http\JsonResponse
-    //  */
-    // protected function respondWithToken($token)
-    // {
-    //     return response()->json([
-    //         'access_token' => $token,
-    //         'token_type' => 'bearer',
-    //         // 'expires_in' => auth()->factory()->getTTL() * 60
-    //         'expires_in' => auth('api')->factory()->getTTL() * 60
-    //     ]);
-    // }
+    public function refresh() {
+        return $this->createNewToken(auth('api')->refresh());
+    }
+    protected function createNewToken($token){
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'user' => auth('api')->user()
+        ]);
+    }
 }

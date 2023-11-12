@@ -44,27 +44,16 @@ Route::group([],function() {
     });
     
 });
-// Route::group([
- 
-//     'middleware' => 'api',
-//     'prefix' => 'auth'
- 
-// ], function ($router) {
-//     Route::post('/register', [AuthController::class, 'register'])->name('register');
-//     Route::post('/login', [AuthController::class, 'login'])->name('login');
-//     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-//     Route::post('/refresh', [AuthController::class, 'refresh'])->name('refresh');
-//     Route::post('/me', [AuthController::class, 'me'])->name('me');
-// });
-
-//API route để đăng ký
-Route::post('/register', [AuthController::class, 'register']);
-//API route để đăng nhập
-Route::post('/login', [AuthController::class, 'login']);
-Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('/profile', function(Request $request) { 
-        return auth()->user();
-    });
-    // API route thoát
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth'
+], function ($router) {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    Route::get('/user-profile', [AuthController::class, 'userProfile']);
+    Route::post('/update', [AuthController::class, 'update']);  
+    Route::get('/profilelist', [AuthController::class, 'profilelist']);   
 });
+
