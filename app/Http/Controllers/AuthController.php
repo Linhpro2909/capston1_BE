@@ -19,7 +19,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register','profilelist','update']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register','profilelist','update','delete']]);
     }
 
 
@@ -75,6 +75,23 @@ class AuthController extends Controller
         }
         return $this->createNewToken($token);
     }
+    public function delete(Request $request)
+{
+   $user= User::where('id', $request->id)->first();
+   
+    if ($user) {
+       $user->delete();
+        return response()->json([
+            'status'    => 1,
+            'message'   => 'Đã xóa thành công!',
+        ]);
+    } else {
+        return response()->json([
+            'status'    => 0,
+            'message'   => 'không tồn tại!',
+        ]);
+    }
+}
     public function logout() {
         auth()->logout();
         return response()->json(['message' => 'User successfully signed out']);

@@ -67,6 +67,7 @@ Route::group([
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::post('/update', [AuthController::class, 'update']);  
+    Route::post('/delete', [AuthController::class, 'delete']);  
     Route::get('/profilelist', [AuthController::class, 'profilelist']);   
 });
 
