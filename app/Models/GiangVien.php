@@ -15,5 +15,7 @@ class GiangVien extends Model
         'ngay_thang_nam_sinh',
         'dia_chi',
         'dia_chi_cong_tac',
+        'email',
+        'password'
     ];
 }

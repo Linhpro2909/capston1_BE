@@ -6,23 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
     public function up()
     {
-        Schema::create('de_tai_sinh_viens', function (Blueprint $table) {
+        Schema::create('ke_hoach_do_ans', function (Blueprint $table) {
             $table->id();
-            $table->string('ten_sinh_vien')->nullable();
-            $table->string('ma_so_sinh_vien')->nullable();
-            $table->string('ten_de_tai');
+            $table->string('ten_ke_hoach');
+            $table->date('thoi_gian');
             $table->string('mo_ta');
-            $table->string('ngon_ngu_lap_trinh');
+            $table->string('image');
             $table->integer('tinh_trang')->default(0);
-            $table->string('ma_nhom');
-            $table->string('ten_nhom');
             $table->timestamps();
         });
     }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
     public function down()
     {
-        Schema::dropIfExists('de_tai_sinh_viens');
+        Schema::dropIfExists('ke_hoach_do_ans');
     }
 };

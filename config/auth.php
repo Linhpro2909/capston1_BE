@@ -39,12 +39,19 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
-            
+
         ],
-        'api' => [
-            'driver' => 'jwt',
-            'provider' => 'users',
-            // 'hash' => false,
+        'admin' => [
+            'driver' => 'sanctum',
+            'provider' => 'admins',
+        ],
+        'admin_session' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+        'sinh_vien' => [//3
+            'driver' => 'session',
+            'provider' => 'sinh_vien',
         ],
     ],
 
@@ -70,7 +77,14 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
+        'sinh_vien' => [//3
+            'driver' => 'eloquent',
+            'model' => App\Models\SinhVien::class,
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

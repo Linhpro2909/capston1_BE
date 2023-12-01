@@ -13,15 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('hoi_dongs', function (Blueprint $table) {
+        Schema::create('nhat_ky_nhoms', function (Blueprint $table) {
             $table->id();
-            $table->string('ten_hoi_dong');
-            $table->string('id_chu_tich');
-            $table->string('list_id_hoi_dong');
-            $table->string('id_thu_ky');
-            $table->string('id_uy_vien');
+            $table->string('ten_nhat_ky');
             $table->date('thoi_gian');
-            $table->string('list_ma_nhom');
+            $table->string('mo_ta');
+            $table->integer('tinh_trang');
+            $table->string('file')->nullable();
+            $table->string('ten_file')->nullable();
+            $table->string('ma_nhom');
+            $table->integer('id_sinh_vien');
             $table->timestamps();
         });
     }
@@ -33,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hoi_dongs');
+        Schema::dropIfExists('nhat_ky_nhoms');
     }
 };

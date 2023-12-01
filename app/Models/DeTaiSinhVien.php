@@ -10,11 +10,13 @@ class DeTaiSinhVien extends Model
     use HasFactory;
     protected $table='de_tai_sinh_viens';
     protected $fillable=[
-           'ten_sinh_vien',
-           'ma_so_sinh_vien',
-           'ten_de_tai',
-           'mo_ta',
-           'ngon_ngu_lap_trinh',
-           'tinh_trang',
+        'ten_sinh_vien',
+        'ma_so_sinh_vien',
+        'ten_de_tai',
+        'mo_ta',
+        'ngon_ngu_lap_trinh',
+        'tinh_trang',
+        'ma_nhom',
+        'ten_nhom'
     ];
 }

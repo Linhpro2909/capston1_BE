@@ -15,6 +15,9 @@ return new class extends Migration
             $table->string('ma_sinh_vien');
             $table->integer('so_dien_thoai');
             $table->float('diem_gpa');
+            $table->integer('tinh_trang');
+            $table->integer('id_nien_khoa');
+            $table->string('password');
             $table->timestamps();
         });
     }

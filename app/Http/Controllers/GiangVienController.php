@@ -10,6 +10,7 @@ class GiangVienController extends Controller
     public function createData(Request $request)
     {
         $data = $request->all();
+        $data['password'] = bcrypt($data['password']);
         GiangVien::create($data);
         return response()->json([
             'status'        => 1,

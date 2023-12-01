@@ -15,6 +15,8 @@ return new class extends Migration
             $table->date('ngay_thang_nam_sinh');
             $table->string('dia_chi');
             $table->string('dia_chi_cong_tac');
+            $table->string('email');
+            $table->string('password');
             $table->timestamps();
         });
     }
