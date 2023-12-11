@@ -11,7 +11,9 @@ class HoiDong extends Model
     protected $table='hoi_dongs';
     protected $fillable=[
         'ten_hoi_dong',
+        
         'list_id_hoi_dong',
+        
         'thanh_vien_hoi_dong',
         'thoi_gian',
         'list_ma_nhom'

@@ -16,8 +16,9 @@ return new class extends Migration
         Schema::create('nien_khoas', function (Blueprint $table) {
             $table->id();
             $table->string('ten_nien_khoa');
-            $table->string('thoi_gian_bat_dau');
-            $table->string('thoi_gian_ket_thuc');
+            $table->date('thoi_gian_bat_dau');
+            $table->date('thoi_gian_ket_thuc');
+            $table->string('ma_nien_khoa');
             $table->integer('tinh_trang');
             $table->timestamps();
         });

@@ -61,7 +61,23 @@ class FileController extends Controller
             ]);
         }
     }
+    public function delete(Request $request)
+    {
+        $KeHoach = KeHoach::find($request->id);
+        if ($KeHoach) {
+            $KeHoach->delete();
 
+            return response()->json([
+                'status'    => 1,
+                'message'   => 'Đã xóa Plan thành công ' ,
+            ]);
+        } else {
+            return response()->json([
+                'status'    => 0,
+                'message'   => 'Plan không tồn tại!',
+            ]);
+        }
+    }
     public function updateFile(Request $request)
     {
         $ke_hoach = KeHoach::find($request->id);

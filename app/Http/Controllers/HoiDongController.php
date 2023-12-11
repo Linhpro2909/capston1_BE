@@ -23,6 +23,7 @@ class HoiDongController extends Controller
         return response()->json([
             'status'        => 1,
             'message'       => "Đã thêm hội đồng thành công!",
+            
         ]);
     }
     public function getData()

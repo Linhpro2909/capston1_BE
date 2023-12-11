@@ -101,6 +101,7 @@ Route::group(['prefix' => '/ke-hoach-tot-nghiep'], function () {
     Route::post('/create', [FileController::class, 'uploadFile']);
     Route::post('/update', [FileController::class, 'updateFile']);
     Route::post('/status', [FileController::class, 'statusKeHoach']);
+    Route::post('/delete', [FileController::class, 'delete']);
 });
 Route::post('/login', [AdminController::class, 'login']);
 
