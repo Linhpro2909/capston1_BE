@@ -14,20 +14,53 @@ use stdClass;
 
 class HoiDongController extends Controller
 {
+    // public function createDatta(Request $request)
+    // {
+    //     $data = $request->all();
+    //     $data['id_chu_tich'] = $request->ten_chu_tich;
+    //     $data['id_thu_ky'] = $request->ten_thu_ky;
+    //     $data['id_uy_vien'] = $request->ten_uy_vien;
+    //     $string = $request->ten_chu_tich . "," . $request->ten_thu_ky . "," . $request->ten_uy_vien;
+    //     $data['list_id_hoi_dong'] = $string;
+    //     HoiDong::create($data);
+    //     return response()->json([
+    //         'status'        => 1,
+    //         'message'       => "Đã thêm hội đồng thành công!",
+    //     ]);
+    // }
     public function createDatta(Request $request)
     {
+        // Validate that each lecturer holds a unique position
+        $selectedLecturers = [
+            $request->ten_chu_tich,
+            $request->ten_thu_ky,
+            $request->ten_uy_vien,
+        ];
+
+        if (count($selectedLecturers) !== count(array_unique($selectedLecturers))) {
+            // Nếu có trùng lặp, trả về một phản hồi lỗi
+            return response()->json([
+                'status'  => 0,
+                'message' => "Mỗi giảng viên chỉ được giữ một vị trí.",
+            ]);
+        }
+
         $data = $request->all();
         $data['id_chu_tich'] = $request->ten_chu_tich;
         $data['id_thu_ky'] = $request->ten_thu_ky;
         $data['id_uy_vien'] = $request->ten_uy_vien;
         $string = $request->ten_chu_tich . "," . $request->ten_thu_ky . "," . $request->ten_uy_vien;
         $data['list_id_hoi_dong'] = $string;
+
+        // Tạo bản ghi HoiDong
         HoiDong::create($data);
+
         return response()->json([
-            'status'        => 1,
-            'message'       => "Đã thêm hội đồng thành công!",
+            'status'  => 1,
+            'message' => "Đã thêm hội đồng thành công!",
         ]);
     }
+
     public function getData()
     {
         $data = HoiDong::get();
