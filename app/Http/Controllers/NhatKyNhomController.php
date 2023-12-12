@@ -44,6 +44,7 @@ class NhatKyNhomController extends Controller
         } else {
             $data = [];
         }
+
         return response()->json([
             'status'    => 1,
             'data'      => $data,
@@ -68,8 +69,13 @@ class NhatKyNhomController extends Controller
         foreach ($data as $key => $value) {
             $list_tv = Nhom::where('nhoms.ma_nhom', $value['ma_nhom'])
                             ->join('sinh_viens', 'sinh_viens.id', 'nhoms.id_sinh_vien')
-                            ->select('nhoms.id_sinh_vien', 'sinh_viens.ten_sinh_vien')
+                            ->select('nhoms.id_sinh_vien', 'sinh_viens.ten_sinh_vien','sinh_viens.diem_mentor', 'sinh_viens.diem_chu_tich', 'sinh_viens.diem_thu_ky', 'sinh_viens.diem_uy_vien')
                             ->get();
+            foreach ($list_tv as $k_1 => $v_1) {
+                $diem_tong = ($v_1['diem_mentor'] * 0.3) + ((($v_1['diem_chu_tich'] + $v_1['diem_thu_ky'] + $v_1['diem_uy_vien']) / 3) * 0.7);
+                $v_1['diem_tong'] = round($diem_tong, 2);
+            }
+
             $value['list'] = $list_tv;
         }
 

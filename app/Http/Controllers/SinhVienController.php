@@ -24,7 +24,6 @@ class SinhVienController extends Controller
     {
         $data = SinhVien::get();
         return response()->json([
-            'status'    => 1,
             'data'      => $data,
         ]);
     }

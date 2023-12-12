@@ -18,6 +18,10 @@ return new class extends Migration
             $table->integer('tinh_trang');
             $table->integer('id_nien_khoa');
             $table->string('password');
+            $table->float('diem_mentor')->default(0);
+            $table->float('diem_chu_tich')->default(0);
+            $table->float('diem_thu_ky')->default(0);
+            $table->float('diem_uy_vien')->default(0);
             $table->timestamps();
         });
     }

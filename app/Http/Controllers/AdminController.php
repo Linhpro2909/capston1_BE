@@ -31,4 +31,13 @@ class AdminController extends Controller
         }
     }
 
+    public function checklogin(Request $request)
+    {
+        $user = auth('sanctum')->user();
+
+        return response()->json([
+            'user'  => $user
+        ], 200);
+    }
+
 }

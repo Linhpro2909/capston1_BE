@@ -17,13 +17,15 @@ class HoiDongController extends Controller
     public function createDatta(Request $request)
     {
         $data = $request->all();
+        $data['id_chu_tich'] = $request->ten_chu_tich;
+        $data['id_thu_ky'] = $request->ten_thu_ky;
+        $data['id_uy_vien'] = $request->ten_uy_vien;
         $string = $request->ten_chu_tich . "," . $request->ten_thu_ky . "," . $request->ten_uy_vien;
         $data['list_id_hoi_dong'] = $string;
         HoiDong::create($data);
         return response()->json([
             'status'        => 1,
             'message'       => "Đã thêm hội đồng thành công!",
-            
         ]);
     }
     public function getData()
@@ -111,7 +113,7 @@ class HoiDongController extends Controller
     }
 
     public function getDataNhom() {
-        $data = Nhom::select('ten_nhom','ma_nhom')->get();
+        $data = Nhom::select('ten_nhom','ma_nhom')->groupby('ten_nhom','ma_nhom')->get();
         return response()->json([
             'data'   => $data,
         ]);

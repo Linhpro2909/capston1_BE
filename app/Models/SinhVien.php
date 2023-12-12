@@ -21,5 +21,9 @@ class SinhVien extends Authenticatable
         'diem_gpa',
         'tinh_trang',
         'password',
+        'diem_mentor',
+        'diem_chu_tich',
+        'diem_thu_ky',
+        'diem_uy_vien',
     ];
 }

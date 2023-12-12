@@ -61,7 +61,7 @@ class FileController extends Controller
             ]);
         }
     }
-    public function delete(Request $request)
+    public function delete_plan(Request $request)
     {
         $KeHoach = KeHoach::find($request->id);
         if ($KeHoach) {
@@ -69,12 +69,12 @@ class FileController extends Controller
 
             return response()->json([
                 'status'    => 1,
-                'message'   => 'Đã xóa Plan thành công ' ,
+                'message'   => 'Đã xóa kế hoạch thành công ' ,
             ]);
         } else {
             return response()->json([
                 'status'    => 0,
-                'message'   => 'Plan không tồn tại!',
+                'message'   => 'Kế hoạch không tồn tại!',
             ]);
         }
     }

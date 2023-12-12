@@ -14,6 +14,7 @@ use App\Http\Controllers\HoiDongController;
 use App\Http\Controllers\KeHoachController;
 use App\Http\Controllers\NhatKyNhomController;
 use App\Http\Controllers\NhomController;
+use App\Http\Controllers\TienDoController;
 use App\Http\Controllers\TmpNhomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,14 +31,19 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/sinh-vien/login', [SinhVienController::class, 'actionApiLoginSinhVien']);
+Route::post('/giang-vien/login', [GiangVienController::class, 'actionApiLoginGiangVien']);
+Route::post('/login', [AdminController::class, 'login']);
 
 Route::group(['prefix' => '/', 'middleware' => 'auth:sanctum'], function () {
     Route::post('/check-login', [CheckLoginController::class, 'checklogin']); //4
 });
+
 Route::post('/sinh-vien/logout', [CheckLoginController::class, 'Logout']); //4
+Route::post('/giang-vien/logout', [GiangVienController::class, 'Logout']); //4
 
 Route::get('/download/{filename}', [FileController::class, 'downloadFile']);
-Route::group([], function () {
+Route::group(['prefix'  => '/admin'], function () {
+
     Route::group(['prefix'  => '/hoi-dong'], function () {
         Route::get('/data-danh-sach-nhom', [HoiDongController::class, 'getDataDanhSachNhom']);
         Route::get('/data-nhom', [HoiDongController::class, 'getDataNhom']);
@@ -49,7 +55,6 @@ Route::group([], function () {
         Route::post('/xoa-hoi-dong', [HoiDongController::class, 'xoaHoiDong']);
         Route::post('/update-nhom', [HoiDongController::class, 'updateNhom']);
     });
-
     Route::group(['prefix'  => '/nien-khoa'], function () {
         Route::get('/data', [NienKhoaController::class, 'getData']);
         Route::post('/create', [NienKhoaController::class, 'createData']);
@@ -84,16 +89,19 @@ Route::group([], function () {
     Route::group(['prefix' => '/tmp-nhom'], function () {
         Route::get('/data', [TmpNhomController::class, "getData"]);
         Route::post('/create', [TmpNhomController::class, "createData"]);
-        Route::post('/update', [TmpNhomController::class, "updateData"]);
         Route::post('/delete', [TmpNhomController::class, "deleteData"]);
     });
     Route::group(['prefix' => '/nhom'], function () {
         Route::get('/data', [NhomController::class, "getDataNhom"]);
         Route::get('/data-sinh-vien-nhom', [NhomController::class, "getSinhVienNhom"]);
         Route::post('/create', [NhomController::class, "createData"]);
-        Route::post('/update', [NhomController::class, "updateData"]);
         Route::post('/thay-doi-sinh-vien', [NhomController::class, "thayDoiSinhVienNhom"]);
         Route::post('/delete', [NhomController::class, "deleteData"]);
+    });
+    Route::group(['prefix' => '/tien-do'], function () {
+        Route::get('/data', [TienDoController::class, "getDataTienDo"]);
+        Route::post('/chi-tiet-data', [TienDoController::class, "chiTietNhom"]);
+
     });
 });
 Route::group(['prefix' => '/ke-hoach-tot-nghiep'], function () {
@@ -101,9 +109,9 @@ Route::group(['prefix' => '/ke-hoach-tot-nghiep'], function () {
     Route::post('/create', [FileController::class, 'uploadFile']);
     Route::post('/update', [FileController::class, 'updateFile']);
     Route::post('/status', [FileController::class, 'statusKeHoach']);
-    Route::post('/delete', [FileController::class, 'delete']);
+    Route::post('/delete', [FileController::class, 'delete_plan']);
+
 });
-Route::post('/login', [AdminController::class, 'login']);
 
 Route::group(['prefix' => '/sinh-vien'], function () {
     Route::group(['prefix' => '/nhat-ky'], function () {
@@ -114,14 +122,21 @@ Route::group(['prefix' => '/sinh-vien'], function () {
         Route::get('/download/{filename}', [NhatKyNhomController::class, 'downloadFile']);
         Route::post('/delete', [NhatKyNhomController::class, 'deleteNhatKy']);
     });
-
     Route::group(['prefix'  => '/de-tai-sinh-vien'], function () {
         Route::get('/data', [DeTaiSinhVienController::class, 'getData']);
         Route::post('/create', [DeTaiSinhVienController::class, 'createData']);
-        Route::post('/update', [DeTaiSinhVienController::class, 'updateData']);
-        Route::post('/delete', [DeTaiSinhVienController::class, 'deleteData']);
-        Route::post('/search', [DeTaiSinhVienController::class, 'searchData']);
-        Route::post('/trang-thai', [DeTaiSinhVienController::class, 'trangthai']);
-        Route::post('/trang-thai-1', [DeTaiSinhVienController::class, 'trangthai1']);
+    });
+});
+
+Route::group(['prefix' => '/giang-vien'], function () {
+    Route::group(['prefix' => '/do-an'], function () {
+        Route::post('/get-data-nhom-do-an', [GiangVienController::class, 'getNhomDoAn']);
+        Route::post('/update-diem-mentor', [GiangVienController::class, 'updateDiemMentor']);
+        Route::post('/get-data', [GiangVienController::class, 'getDataChiTiet']);
+        Route::get('/download/{filename}', [GiangVienController::class, 'downloadFile']);
+    });
+    Route::group(['prefix' => '/nhom-do-an'], function () {
+        Route::post('/get-data', [GiangVienController::class, 'getNhom']);
+        Route::post('/cho-diem', [GiangVienController::class, 'updateDiem']);
     });
 });

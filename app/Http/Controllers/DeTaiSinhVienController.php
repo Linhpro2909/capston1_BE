@@ -12,13 +12,32 @@ class DeTaiSinhVienController extends Controller
     {
         $data = $request->all();
         $id_user = $request->id_user;
-        $nhom = Nhom::where('id_sinh_vien', $id_user)->first();//mã nhóm
+        $nhom = Nhom::where('id_sinh_vien', $id_user)->first(); //mã nhóm
         $data['ma_nhom'] = $nhom->ma_nhom;
         $data['ten_nhom'] = $nhom->ten_nhom;
+
+        // Kiểm tra tên đề tài trùng khoảng 80%
+        $tenDeTaiMoi = $data['ten_de_tai'];
+        $tenDeTaiDaTonTai = DeTaiSinhVien::where('ma_nhom', $data['ma_nhom'])
+            ->pluck('ten_de_tai')
+            ->toArray();
+
+        foreach ($tenDeTaiDaTonTai as $tenDaTonTai) {
+            similar_text($tenDeTaiMoi, $tenDaTonTai, $percent);
+            if ($percent >= 80) {
+                return response()->json([
+                    'status'  => 0,
+                    'message' => 'Tên đề tài của bạn dường như đã trùng lặp với một đề tài khác.',
+                ]);
+            }
+        }
+
+        // Nếu không có sự trùng lặp, tạo đề tài mới
         DeTaiSinhVien::create($data);
+
         return response()->json([
-            'status'        => 1,
-            'message'       => "Đã tạo đề tài thành công!",
+            'status'  => 1,
+            'message' => 'Đã tạo đề tài thành công!',
         ]);
     }
     public function getData()

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('ten_file')->nullable();
             $table->string('ma_nhom');
             $table->integer('id_sinh_vien');
+
             $table->timestamps();
         });
     }

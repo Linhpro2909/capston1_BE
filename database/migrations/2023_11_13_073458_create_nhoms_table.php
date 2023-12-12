@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('ma_nhom');
             $table->integer('id_sinh_vien');
             $table->integer('id_giang_vien');
+            $table->integer('id_hoi_dong')->nullable();
             $table->timestamps();
         });
     }

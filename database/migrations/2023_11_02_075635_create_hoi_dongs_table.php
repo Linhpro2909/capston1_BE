@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('id_thu_ky');
             $table->string('id_uy_vien');
             $table->date('thoi_gian');
-            $table->string('list_ma_nhom');
+            $table->string('list_ma_nhom')->nullable();
             $table->timestamps();
         });
     }

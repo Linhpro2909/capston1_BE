@@ -53,6 +53,10 @@ return [
             'driver' => 'session',
             'provider' => 'sinh_vien',
         ],
+        'giang_vien' => [//3
+            'driver' => 'session',
+            'provider' => 'giang_vien',
+        ],
     ],
 
     /*
@@ -84,6 +88,10 @@ return [
         'sinh_vien' => [//3
             'driver' => 'eloquent',
             'model' => App\Models\SinhVien::class,
+        ],
+        'giang_vien' => [//3
+            'driver' => 'eloquent',
+            'model' => App\Models\GiangVien::class,
         ],
         // 'users' => [
         //     'driver' => 'database',
