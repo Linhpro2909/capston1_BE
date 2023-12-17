@@ -10,10 +10,14 @@ class CheckLoginController extends Controller
     public function checklogin(Request $request)
     {
         $user = auth('sanctum')->user();
-
-        return response()->json([
-            'user'  => $user
-        ], 200);
+        if($user) {
+            return response()->json([
+                'user'  => $user
+            ], 200);
+        } else {
+            return response()->json([
+            ], 401);
+        }
     }
 
     public function Logout()

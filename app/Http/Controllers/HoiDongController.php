@@ -14,20 +14,6 @@ use stdClass;
 
 class HoiDongController extends Controller
 {
-    // public function createDatta(Request $request)
-    // {
-    //     $data = $request->all();
-    //     $data['id_chu_tich'] = $request->ten_chu_tich;
-    //     $data['id_thu_ky'] = $request->ten_thu_ky;
-    //     $data['id_uy_vien'] = $request->ten_uy_vien;
-    //     $string = $request->ten_chu_tich . "," . $request->ten_thu_ky . "," . $request->ten_uy_vien;
-    //     $data['list_id_hoi_dong'] = $string;
-    //     HoiDong::create($data);
-    //     return response()->json([
-    //         'status'        => 1,
-    //         'message'       => "Đã thêm hội đồng thành công!",
-    //     ]);
-    // }
     public function createDatta(Request $request)
     {
         // Validate that each lecturer holds a unique position
@@ -41,7 +27,7 @@ class HoiDongController extends Controller
             // Nếu có trùng lặp, trả về một phản hồi lỗi
             return response()->json([
                 'status'  => 0,
-                'message' => "Mỗi giảng viên chỉ được giữ một vị trí.",
+                'message' => "xin lỗi một trong các giảng viên đã giữ vài trò khác rồi.",
             ]);
         }
 
@@ -52,9 +38,7 @@ class HoiDongController extends Controller
         $string = $request->ten_chu_tich . "," . $request->ten_thu_ky . "," . $request->ten_uy_vien;
         $data['list_id_hoi_dong'] = $string;
 
-        // Tạo bản ghi HoiDong
         HoiDong::create($data);
-
         return response()->json([
             'status'  => 1,
             'message' => "Đã thêm hội đồng thành công!",
@@ -146,7 +130,7 @@ class HoiDongController extends Controller
     }
 
     public function getDataNhom() {
-        $data = Nhom::select('ten_nhom','ma_nhom')->groupby('ten_nhom','ma_nhom')->get();
+        $data = Nhom::join('de_tai_sinh_viens', 'de_tai_sinh_viens.ma_nhom', 'nhoms.ma_nhom')->where('de_tai_sinh_viens.tinh_trang', 1)->select('nhoms.ten_nhom','nhoms.ma_nhom','de_tai_sinh_viens.tinh_trang')->groupby('nhoms.ten_nhom','nhoms.ma_nhom','de_tai_sinh_viens.tinh_trang')->get();
         return response()->json([
             'data'   => $data,
         ]);
@@ -237,22 +221,30 @@ class HoiDongController extends Controller
             $string = $request->id_chu_tich . "," . $request->id_thu_ky . "," . $request->id_uy_vien;
             $data['list_id_hoi_dong'] = $string;
             $array = explode(',', $data['list_id_hoi_dong']);
-            foreach (explode(",", $data['list_ma_nhom']) as $key => $value) {
-                $giang_vien = Nhom::where('ma_nhom', $value)->first();
-                $id_giang_vien = $giang_vien->id_giang_vien;
-                $ten_giang_vien = Nhom::where('ma_nhom', $value)->join('giang_viens', 'giang_viens.id', 'nhoms.id_giang_vien')->select('giang_viens.ten_giang_vien', 'nhoms.ten_nhom')->first();
-                if (in_array($id_giang_vien, $array)) {
-                    return response()->json([
-                        'status'    => 0,
-                        'message'   => 'Giảng viên ' . $ten_giang_vien->ten_giang_vien . " đang hướng dẫn lớp " . $ten_giang_vien->ten_nhom . " vui lòng chọn lại!",
-                    ]);
+            if($data['list_ma_nhom'] != null) {
+                foreach (explode(",", $data['list_ma_nhom']) as $key => $value) {
+                    $giang_vien = Nhom::where('ma_nhom', $value)->first();
+                    $id_giang_vien = $giang_vien->id_giang_vien;
+                    $ten_giang_vien = Nhom::where('ma_nhom', $value)->join('giang_viens', 'giang_viens.id', 'nhoms.id_giang_vien')->select('giang_viens.ten_giang_vien', 'nhoms.ten_nhom')->first();
+                    if (in_array($id_giang_vien, $array)) {
+                        return response()->json([
+                            'status'    => 0,
+                            'message'   => 'Giảng viên ' . $ten_giang_vien->ten_giang_vien . " đang hướng dẫn lớp " . $ten_giang_vien->ten_nhom . " vui lòng chọn lại!",
+                        ]);
+                    }
                 }
+                $hoi_dong->update($data);
+                return response()->json([
+                    'status'    => 1,
+                    'message'   => 'Đã cập nhật thành công!',
+                ]);
+            } else {
+                $hoi_dong->update($data);
+                return response()->json([
+                    'status'    => 1,
+                    'message'   => 'Đã cập nhật thành công!',
+                ]);
             }
-            $hoi_dong->update($data);
-            return response()->json([
-                'status'    => 1,
-                'message'   => 'Đã cập nhật thành công!',
-            ]);
         } else {
             return response()->json([
                 'status'    => 0,

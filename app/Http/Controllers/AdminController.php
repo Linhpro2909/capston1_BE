@@ -11,12 +11,12 @@ class AdminController extends Controller
 
     public function login(Request $request)
     {
-        $auth = Auth::guard('admin_session')->attempt([
+        $auth = Auth::guard('admin')->attempt([
             'email'    => $request->email,
             'password' => $request->password,
         ]);
         if ($auth) {
-            $user = Auth::guard('admin_session')->user();
+            $user = Auth::guard('admin')->user();
             $token = $user->createToken('admin_token')->plainTextToken;
             return response()->json([
                 'status'    => 1,
@@ -40,4 +40,12 @@ class AdminController extends Controller
         ], 200);
     }
 
+    public function Logout()
+    {
+        Auth::guard('admin')->logout();
+        return response()->json([
+            'status'    => 1,
+            'message'   => "Đã đăng xuất thành công!"
+        ]);
+    }
 }

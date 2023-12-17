@@ -59,12 +59,20 @@ class NhatKyNhomController extends Controller
                     ->first();
 
         $data = Nhom::where('nhoms.ma_nhom', $ma->ma_nhom)
-            ->join('giang_viens', 'giang_viens.id', 'nhoms.id_giang_vien')
-            ->join('de_tai_sinh_viens', 'de_tai_sinh_viens.ma_nhom', 'nhoms.ma_nhom')
-            ->join('hoi_dongs', 'hoi_dongs.id', 'nhoms.id_hoi_dong')
-            ->select('nhoms.ten_nhom', 'nhoms.ma_nhom', 'nhoms.id_giang_vien', 'giang_viens.ten_giang_vien', 'de_tai_sinh_viens.ten_de_tai', 'hoi_dongs.ten_hoi_dong')
-            ->groupBy('nhoms.ten_nhom', 'nhoms.ma_nhom', 'nhoms.id_giang_vien', 'giang_viens.ten_giang_vien', 'de_tai_sinh_viens.ten_de_tai', 'hoi_dongs.ten_hoi_dong')
-            ->get();
+                    ->leftJoin('de_tai_sinh_viens', function ($join) {
+                        $join->on('de_tai_sinh_viens.ma_nhom', '=', 'nhoms.ma_nhom')
+                             ->where(function ($query) {
+                                 $query->where('de_tai_sinh_viens.tinh_trang', 1)
+                                       ->orWhere('de_tai_sinh_viens.tinh_trang', 0)
+                                       ->orWhere('de_tai_sinh_viens.tinh_trang', 2);
+                             });
+                    })
+                    ->join('giang_viens', 'giang_viens.id', 'nhoms.id_giang_vien')
+                    ->leftJoin('hoi_dongs', 'hoi_dongs.id', 'nhoms.id_hoi_dong')
+                    ->select('nhoms.ten_nhom', 'nhoms.ma_nhom', 'nhoms.id_giang_vien', 'giang_viens.ten_giang_vien', 'de_tai_sinh_viens.ten_de_tai', 'hoi_dongs.ten_hoi_dong', 'de_tai_sinh_viens.tinh_trang')
+                    ->groupBy('nhoms.ten_nhom', 'nhoms.ma_nhom', 'nhoms.id_giang_vien', 'giang_viens.ten_giang_vien', 'de_tai_sinh_viens.ten_de_tai', 'hoi_dongs.ten_hoi_dong', 'de_tai_sinh_viens.tinh_trang')
+                    ->get();
+
 
         foreach ($data as $key => $value) {
             $list_tv = Nhom::where('nhoms.ma_nhom', $value['ma_nhom'])

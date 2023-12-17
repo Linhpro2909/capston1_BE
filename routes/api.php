@@ -34,12 +34,11 @@ Route::post('/sinh-vien/login', [SinhVienController::class, 'actionApiLoginSinhV
 Route::post('/giang-vien/login', [GiangVienController::class, 'actionApiLoginGiangVien']);
 Route::post('/login', [AdminController::class, 'login']);
 
-Route::group(['prefix' => '/', 'middleware' => 'auth:sanctum'], function () {
-    Route::post('/check-login', [CheckLoginController::class, 'checklogin']); //4
-});
+Route::post('/check-login', [CheckLoginController::class, 'checklogin']); //4
 
 Route::post('/sinh-vien/logout', [CheckLoginController::class, 'Logout']); //4
 Route::post('/giang-vien/logout', [GiangVienController::class, 'Logout']); //4
+Route::post('/admin/logout', [AdminController::class, 'Logout']); //4
 
 Route::get('/download/{filename}', [FileController::class, 'downloadFile']);
 Route::group(['prefix'  => '/admin'], function () {
@@ -79,12 +78,13 @@ Route::group(['prefix'  => '/admin'], function () {
     });
     Route::group(['prefix'  => '/de-tai-sinh-vien'], function () {
         Route::get('/data', [DeTaiSinhVienController::class, 'getData']);
-        Route::post('/create', [DeTaiSinhVienController::class, 'createData']);
         Route::post('/update', [DeTaiSinhVienController::class, 'updateData']);
         Route::post('/delete', [DeTaiSinhVienController::class, 'deleteData']);
         Route::post('/search', [DeTaiSinhVienController::class, 'searchData']);
         Route::post('/trang-thai', [DeTaiSinhVienController::class, 'trangthai']);
-        Route::post('/trang-thai-1', [DeTaiSinhVienController::class, 'trangthai1']);
+        Route::post('/cap-nhat-thoi-gian', [DeTaiSinhVienController::class, 'capNhatTime']);
+        Route::post('/trang-thai-1', [DeTaiSinhVienController::class, 'huyDeTai']);
+        Route::post('/xoa-de-tai', [DeTaiSinhVienController::class, 'xoaDeTai']);
     });
     Route::group(['prefix' => '/tmp-nhom'], function () {
         Route::get('/data', [TmpNhomController::class, "getData"]);
@@ -125,6 +125,7 @@ Route::group(['prefix' => '/sinh-vien'], function () {
     Route::group(['prefix'  => '/de-tai-sinh-vien'], function () {
         Route::get('/data', [DeTaiSinhVienController::class, 'getData']);
         Route::post('/create', [DeTaiSinhVienController::class, 'createData']);
+        Route::post('/edit-de-tai', [DeTaiSinhVienController::class, 'editDeTai']);
     });
 });
 
