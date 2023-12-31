@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class GiangVienSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
         DB::table('giang_viens')->delete();

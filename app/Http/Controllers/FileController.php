@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\KeHoach;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 
 class FileController extends Controller
 {
@@ -77,39 +76,5 @@ class FileController extends Controller
                 'message'   => 'Kế hoạch không tồn tại!',
             ]);
         }
-    }
-    public function updateFile(Request $request)
-    {
-        $ke_hoach = KeHoach::find($request->id);
-        if ($ke_hoach) {
-            if($request->file != null) {
-
-            } else {
-
-            }
-        } else {
-            # code...
-        }
-
-        // try {
-        //     if ($request->hasFile('file')) {
-        //         $file = $request->file('file');
-        //         $fileName = time() . '_' . $file->getClientOriginalName();
-        //         $file->storeAs('public/uploaded_files', $fileName);
-        //         KeHoach::updated([
-        //             'ten_ke_hoach'  => $request->ten_ke_hoach,
-        //             'ngay'          => $request->ngay,
-        //             'mo_ta'         => $request->mo_ta,
-        //             'file'          => $request->file,
-        //             'tinh_trang'    => $request->tinh_trang,
-        //             'file'          => $fileName,
-        //         ]);
-        //         return response()->json(['message' => 'Đã cập nhật thành công!', 'status' => 1]);
-        //     } else {
-        //         return response()->json(['error' => 'No file uploaded.'], 400);
-        //     }
-        // } catch (\Exception $e) {
-        //     return response()->json(['error' => 'File upload failed.'], 500);
-        // }
     }
 }

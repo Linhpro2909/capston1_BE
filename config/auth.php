@@ -39,17 +39,16 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
-
         ],
         'admin' => [
             'driver' => 'session',
-            'provider' => 'admins',
+            'provider' => 'admin',
         ],
-        'sinh_vien' => [//3
+        'sinh_vien' => [
             'driver' => 'session',
             'provider' => 'sinh_vien',
         ],
-        'giang_vien' => [//3
+        'giang_vien' => [
             'driver' => 'session',
             'provider' => 'giang_vien',
         ],
@@ -77,18 +76,19 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-        'admins' => [
+        'admin' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
         ],
-        'sinh_vien' => [//3
+        'sinh_vien' => [
             'driver' => 'eloquent',
             'model' => App\Models\SinhVien::class,
         ],
-        'giang_vien' => [//3
+        'giang_vien' => [
             'driver' => 'eloquent',
             'model' => App\Models\GiangVien::class,
         ],
+
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

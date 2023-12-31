@@ -8,6 +8,14 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
+    public function Logout()
+    {
+        Auth::guard('admin')->logout();
+        return response()->json([
+            'status'    => 1,
+            'message'   => "Đã đăng xuất thành công!"
+        ]);
+    }
 
     public function login(Request $request)
     {
@@ -29,23 +37,5 @@ class AdminController extends Controller
                 'message'   => 'Thất bại',
             ]);
         }
-    }
-
-    public function checklogin(Request $request)
-    {
-        $user = auth('sanctum')->user();
-
-        return response()->json([
-            'user'  => $user
-        ], 200);
-    }
-
-    public function Logout()
-    {
-        Auth::guard('admin')->logout();
-        return response()->json([
-            'status'    => 1,
-            'message'   => "Đã đăng xuất thành công!"
-        ]);
     }
 }

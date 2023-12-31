@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DeTaiSinhVien;
+use App\Models\Diem;
 use App\Models\GiangVien;
 use App\Models\HoiDong;
-use App\Models\NhatKyNhom;
 use App\Models\Nhom;
 use App\Models\SinhVien;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +56,7 @@ class GiangVienController extends Controller
             'data'       => $request->all(),
         ]);
     }
+
     public function getData()
     {
         $data = GiangVien::get();
@@ -62,6 +65,7 @@ class GiangVienController extends Controller
             'data'      => $data,
         ]);
     }
+
     public function updateData(Request $request)
     {
         $sinh_vien  = GiangVien::where('id', $request->id)->first();
@@ -79,6 +83,7 @@ class GiangVienController extends Controller
             ]);
         }
     }
+
     public function deleteData(Request $request)
     {
 
@@ -112,6 +117,7 @@ class GiangVienController extends Controller
             'message'   => 'Đã xóa thành công!',
         ]);
     }
+
     public function searchData(Request $request)
     {
         $ten_can_tim    = '%' . $request->ten_giang_vien . '%';
@@ -122,136 +128,291 @@ class GiangVienController extends Controller
         ]);
     }
 
-    public function getNhomDoAn(Request $request) {
-        $data = Nhom::where('nhoms.id_giang_vien', $request->id)
-                    ->join('giang_viens', 'giang_viens.id', 'nhoms.id_giang_vien')
-                    ->leftJoin('de_tai_sinh_viens', function ($join) {
-                        $join->on('de_tai_sinh_viens.ma_nhom', '=', 'nhoms.ma_nhom')
-                             ->where(function ($query) {
-                                 $query->where('de_tai_sinh_viens.tinh_trang', 1)
-                                       ->orWhere('de_tai_sinh_viens.tinh_trang', 0)
-                                       ->orWhere('de_tai_sinh_viens.tinh_trang', 2);
-                             });
-                    })
-                    ->leftJoin('hoi_dongs', 'hoi_dongs.id', 'nhoms.id_hoi_dong')
-                    ->select('nhoms.ten_nhom', 'nhoms.ma_nhom', 'nhoms.id_giang_vien', 'giang_viens.ten_giang_vien', 'de_tai_sinh_viens.ten_de_tai', 'hoi_dongs.ten_hoi_dong', 'de_tai_sinh_viens.tinh_trang')
-                    ->groupBy('nhoms.ten_nhom', 'nhoms.ma_nhom', 'nhoms.id_giang_vien', 'giang_viens.ten_giang_vien', 'de_tai_sinh_viens.ten_de_tai', 'hoi_dongs.ten_hoi_dong', 'de_tai_sinh_viens.tinh_trang')
-                    ->get();
-        foreach ($data as $key => $value) {
-            $list_tv = Nhom::where('nhoms.ma_nhom', $value['ma_nhom'])
-                            ->join('sinh_viens', 'sinh_viens.id', 'nhoms.id_sinh_vien')
-                            ->select('nhoms.id_sinh_vien', 'sinh_viens.ten_sinh_vien','sinh_viens.diem_mentor')
-                            ->get();
-            $value['list'] = $list_tv;
+    public function getNhomDoAn(Request $request)
+    {
+        $giang_vien = GiangVien::join('nhoms', 'nhoms.id_giang_vien', 'giang_viens.id')
+            ->leftJoin('de_tai_sinh_viens', function ($join) {
+                $join->on('de_tai_sinh_viens.id_nhom', '=', 'nhoms.id')
+                    ->where(function ($query) {
+                        $query->where('de_tai_sinh_viens.tinh_trang', 1)
+                            ->orWhere('de_tai_sinh_viens.tinh_trang', 0);
+                    });
+            })
+            ->leftJoin('hoi_dongs', 'hoi_dongs.id', 'nhoms.id_hoi_dong')
+            ->where('nhoms.id', $request->id)
+            ->select('nhoms.ten_nhom', 'nhoms.id as id_nhom', 'giang_viens.ten_giang_vien', 'de_tai_sinh_viens.ten_de_tai', 'de_tai_sinh_viens.tinh_trang', 'hoi_dongs.ten_hoi_dong')
+            ->get();
+        foreach ($giang_vien as $key => $value) {
+            $list_sv = SinhVien::join('diems', 'diems.id_sinh_vien', 'sinh_viens.id')
+                ->where('id_nhom', $value['id_nhom'])
+                ->select('diems.id as id_diem', 'sinh_viens.ten_sinh_vien', 'diems.diem_mentor')
+                ->get();
+            foreach ($list_sv as $k => $v) {
+                if ($v['diem_mentor'] == null) {
+                    $v['diem_mentor'] = 0;
+                } else {
+                    $v['diem_mentor'] = $v['diem_mentor'];
+                }
+            }
+            $value['list'] = $list_sv;
         }
-
         return response()->json([
-            'data'   => $data,
+            'data'   => $giang_vien,
         ]);
     }
 
     public function updateDiemMentor(Request $request)
     {
-        $data = $request->all();
-        foreach ($data['list'] as $key => $value) {
-            $sinh_vien = SinhVien::where('id', $value['id_sinh_vien'])->first();
-            $sinh_vien->diem_mentor = $value['diem_mentor'];
-            $sinh_vien->save();
-        }
+        $now = Carbon::today();
+        $hoi_dong = Nhom::where('nhoms.id', $request->id_nhom)
+            ->join('hoi_dongs', 'hoi_dongs.id', 'nhoms.id_hoi_dong')
+            ->first();
+        $errors = [];
 
-        return response()->json([
-            'status'    => 1,
-            'message'   => 'Đã cho điểm thành công!',
-        ]);
-    }
-
-    public function getDataChiTiet(Request $request)
-    {
-        $data      = NhatKyNhom::where('ma_nhom', $request->ma_nhom)
-                                ->select('nhat_ky_nhoms.*', DB::raw ("DATE_FORMAT(thoi_gian,'%d/%m/%Y') as thoi_gian "))->get();
-        return response()->json([
-            'status'    => 1,
-            'data'      => $data,
-        ]);
-
-    }
-
-    public function downloadFile($filename)
-    {
-        $filePath = storage_path("app/public/uploaded_files/{$filename}");
-        if (file_exists($filePath)) {
-            $name = basename($filePath);
-
-            return response()->download($filePath, $name);
+        if ($hoi_dong && $now->gte(Carbon::parse($hoi_dong->thoi_gian))) {
+            $errors[] = 'Quá thời hạn cho điểm!';
+            return response()->json([
+                'status'    => 0,
+                'errors'   => $errors,
+            ]);
         } else {
-            return response()->json(['error' => 'File not found.'], 404);
+
+            DB::beginTransaction();
+
+            foreach ($request->list as $key => $value) {
+                if ($value['diem_mentor'] == 0) {
+                    $errors[] = 'Vui lòng nhập điểm cho sinh viên ' . $value['ten_sinh_vien'] . "!";
+                } else {
+                    Diem::where('id', $value['id_diem'])
+                        ->update(['diem_mentor' => $value['diem_mentor']]);
+                }
+            }
+
+            if (!empty($errors)) {
+                DB::rollBack();
+                return response()->json([
+                    'status'  => 0,
+                    'errors'  => $errors,
+                ]);
+            } else {
+                DB::commit();
+                return response()->json([
+                    'status'  => 1,
+                    'message' => 'Cho điểm ' . $request->ten_nhom . ' thành công',
+                ]);
+            }
         }
     }
 
     public function getNhom(Request $request)
     {
         $hoiDong = HoiDong::whereRaw("FIND_IN_SET(?, list_id_hoi_dong)", [$request->id])
-                                 ->get();
-        foreach($hoiDong as $key => $value) {
-            $arr = explode(',', $value['list_ma_nhom']);
+            ->join('nhoms', 'nhoms.id_hoi_dong', 'hoi_dongs.id')
+            ->join('de_tai_sinh_viens', 'de_tai_sinh_viens.id_nhom', 'nhoms.id')
+            ->select('nhoms.id as id_nhom', 'nhoms.ten_nhom', 'list_id_hoi_dong', 'de_tai_sinh_viens.ten_de_tai', 'hoi_dongs.ten_hoi_dong', 'de_tai_sinh_viens.id_casptone', 'de_tai_sinh_viens.tinh_trang')
+            ->get();
+        foreach ($hoiDong as $key => $value) {
             $idsArray = explode(',', $value['list_id_hoi_dong']);
-            $positions = array_keys($idsArray, (string)$request->id); // Tìm tất cả các vị trí của số 2
-
-            // Vì mảng bắt đầu từ 0, nên bạn cần cộng thêm 1 để có thứ tự thực tế
-            $positions = array_map(function($pos) { return $pos; }, $positions);
+            $positions = array_keys($idsArray, (string)$request->id);
+            $positions = array_map(function ($pos) {
+                return $pos;
+            }, $positions);
             $value['vi_tri'] = $positions[0];
-            foreach ($arr as $k => $v) {
-                $data = Nhom::where('nhoms.ma_nhom', $v)
-                                ->join('giang_viens', 'giang_viens.id', 'nhoms.id_giang_vien')
-                                ->join('de_tai_sinh_viens', 'de_tai_sinh_viens.ma_nhom', 'nhoms.ma_nhom')
-                                ->join('hoi_dongs', 'hoi_dongs.id', 'nhoms.id_hoi_dong')
-                                ->select('nhoms.ten_nhom', 'nhoms.ma_nhom', 'nhoms.id_giang_vien', 'giang_viens.ten_giang_vien', 'de_tai_sinh_viens.ten_de_tai', 'hoi_dongs.ten_hoi_dong')
-                                ->groupBy('nhoms.ten_nhom', 'nhoms.ma_nhom', 'nhoms.id_giang_vien', 'giang_viens.ten_giang_vien', 'de_tai_sinh_viens.ten_de_tai', 'hoi_dongs.ten_hoi_dong')
-                                ->get();
-                foreach ($data as $k_1 => $v_1) {
-                    $list_tv = Nhom::where('nhoms.ma_nhom', $v_1['ma_nhom'])
-                                    ->join('sinh_viens', 'sinh_viens.id', 'nhoms.id_sinh_vien')
-                                    ->select('nhoms.id_sinh_vien', 'sinh_viens.ten_sinh_vien', 'sinh_viens.diem_chu_tich', 'sinh_viens.diem_thu_ky', 'sinh_viens.diem_uy_vien')
-                                    ->get();
-                    foreach ($list_tv as $k_2 => $v_2) {
-                        $diem_tong = ((($v_2['diem_chu_tich'] + $v_2['diem_thu_ky'] + $v_2['diem_uy_vien']) / 3) * 0.7);
-                        $v_2['diem_tong'] = round($diem_tong, 2);
-                    }
-                    $value['ma_nhom'] = $v_1['ma_nhom'];
-                    $value['ten_nhom'] = $v_1['ten_nhom'];
-                    $value['ten_giang_vien'] = $v_1['ten_giang_vien'];
-                    $value['id_giang_vien'] = $v_1['id_giang_vien'];
-                    $value['ten_de_tai'] = $v_1['ten_de_tai'];
-                    $value['ten_hoi_dong'] = $v_1['ten_hoi_dong'];
-                    $value['list'] = $list_tv;
-
+            $value['id_giang_vien'] = $idsArray[$positions[0]];
+            $giang_vien = GiangVien::where('id', $value['id_giang_vien'])->first();
+            $value['ten_giang_vien'] = $giang_vien->ten_giang_vien;
+            $list_tv = Nhom::join('diems', 'diems.id_nhom', 'nhoms.id')
+                ->join('sinh_viens', 'sinh_viens.id', 'diems.id_sinh_vien')
+                ->where('diems.id_nhom', $value['id_nhom'])
+                ->select('diems.id as id_diem', 'sinh_viens.ten_sinh_vien', 'diems.id_nhom', 'diems.diem_chu_tich', 'diems.diem_thu_ky', 'diems.diem_uy_vien')
+                ->get();
+            foreach ($list_tv as $k_2 => $v_2) {
+                if ($positions[0] == 0) {
+                    $v_2['diem_tong'] = round($v_2['diem_chu_tich'], 2);
+                } else if ($positions[0] == 1) {
+                    $v_2['diem_tong'] = round($v_2['diem_thu_ky'], 2);
+                } else {
+                    $v_2['diem_tong'] = round($v_2['diem_uy_vien'], 2);
                 }
             }
+            $value['list'] = $list_tv;
+            // dd($list_tv->toArray());
         }
-
+        // dd(($hoiDong->toArray()));
         return response()->json([
             'data'   => $hoiDong,
         ]);
     }
 
+    // public function updateDiem(Request $request)
+    // {
+    //     $now = Carbon::today();
+    //     $hoi_dong = Nhom::where('nhoms.id', $request->id_nhom)
+    //         ->join('hoi_dongs', 'hoi_dongs.id', 'nhoms.id_hoi_dong')
+    //         ->first();
+    //     $errors = [];
+
+    //     if ($hoi_dong && $now->isSameDay(Carbon::parse($hoi_dong->thoi_gian))) {
+    //         foreach ($request->list as $key => $value) {
+    //             $diem = Diem::where('id', $value['id_diem'])->first();
+    //             // dd($diem->toArray());
+    //             if ($diem) {
+    //                 if ($request->vi_tri == 0) {
+    //                     if ($value['diem_chu_tich'] < 0 || $value['diem_chu_tich'] > 10 || $value['diem_chu_tich'] == null) {
+    //                         $errors[] = 'Yêu cầu phải nhập điểm lớn hơn 0 và nhỏ hơn bằng 10!';
+    //                         return response()->json([
+    //                             'status'    => 0,
+    //                             'errors'    => $errors,
+    //                         ]);
+    //                     }
+    //                     $diem->diem_chu_tich = $value['diem_chu_tich'];
+    //                 } else if ($request->vi_tri == 1) {
+    //                     if ($value['diem_thu_ky'] < 0 || $value['diem_thu_ky'] > 10 ||  $value['diem_thu_ky'] == null) {
+    //                         $errors[] = 'Yêu cầu phải nhập điểm lớn hơn 0 và nhỏ hơn bằng 10!';
+    //                         return response()->json([
+    //                             'status'    => 0,
+    //                             'errors'    => $errors,
+    //                         ]);
+    //                     }
+    //                     $diem->diem_thu_ky = $value['diem_thu_ky'];
+    //                 } else {
+    //                     if ($value['diem_uy_vien'] < 0 || $value['diem_uy_vien'] > 10 || $value['diem_uy_vien'] == null) {
+    //                         $errors[] = 'Yêu cầu phải nhập điểm lớn hơn 0 và nhỏ hơn bằng 10!';
+    //                         return response()->json([
+    //                             'status'    => 0,
+    //                             'errors'    => $errors,
+    //                         ]);
+    //                     }
+    //                     $diem->diem_uy_vien = $value['diem_uy_vien'];
+    //                 }
+    //                 $diem->save();
+    //             }
+    //             if ($diem->diem_chu_tich != null && $diem->diem_thu_ky != null && $diem->diem_uy_vien != null) {
+    //                 $diem_tong = round(((($diem['diem_mentor'] * 0.3) + (($diem['diem_chu_tich'] + $diem['diem_thu_ky'] + $diem['diem_uy_vien']) / 3) * 0.7)), 2);
+    //                 $is_done    = DeTaiSinhVien::where('id_nhom', $request->id_nhom)->first();
+    //                 if ($diem_tong >= 5) {
+    //                     $diem->is_hoan_thanh = 1;
+    //                     $diem->save();
+    //                     Diem::create([
+    //                         'id_sinh_vien'  => $diem['id_sinh_vien'],
+    //                         'id_casptone'   => 2,
+    //                     ]);
+    //                 } else {
+    //                     $diem->is_hoan_thanh = 0;
+    //                     $diem->save();
+    //                     //create
+    //                     Diem::create([
+    //                         'id_sinh_vien'  => $diem['id_sinh_vien'],
+    //                         'id_casptone'   => 1,
+    //                     ]);
+    //                 }
+    //                 $is_done->is_done = 1;
+    //                 $diem->save();
+    //             }
+    //         }
+    //         return response()->json([
+    //             'status'    => 1,
+    //             'message'   => 'Đã cho điểm thành công!',
+    //         ]);
+    //     } else {
+    //         $errors[] = 'Quá thời hạn cho điểm!';
+    //         return response()->json([
+    //             'status'    => 0,
+    //             'errors'   => $errors,
+    //         ]);
+    //     }
+    // }
+
     public function updateDiem(Request $request)
     {
-        $data = $request->all();
-        foreach ($data['list'] as $key => $value) {
-            $sinh_vien = SinhVien::where('id', $value['id_sinh_vien'])->first();
-            if($request['vi_tri'] == 0) {
-                $sinh_vien->diem_chu_tich = $value['diem_chu_tich'];
-            } elseif($request['vi_tri'] == 1) {
-                $sinh_vien->diem_thu_ky = $value['diem_thu_ky'];
-            } else {
-                $sinh_vien->diem_uy_vien = $value['diem_uy_vien'];
+        $now = Carbon::today();
+        $hoi_dong = Nhom::where('nhoms.id', $request->id_nhom)
+            ->join('hoi_dongs', 'hoi_dongs.id', 'nhoms.id_hoi_dong')
+            ->first();
+        $errors = [];
+
+        if (!$hoi_dong || !$now->isSameDay(Carbon::parse($hoi_dong->thoi_gian))) {
+            $errors[] = 'Quá thời hạn cho điểm!';
+            return response()->json([
+                'status'    => 0,
+                'errors'   => $errors,
+            ]);
+        }
+
+        foreach ($request->list as $key => $value) {
+            $diem = Diem::where('id', $value['id_diem'])->first();
+            if (!$diem) {
+                continue; // Skip if diem is not found
             }
-            $sinh_vien->save();
+
+            $diemIsValid = true; // Flag to check if diem is valid
+
+            if ($request->vi_tri == 0) {
+                if (!isset($value['diem_chu_tich']) || $value['diem_chu_tich'] < 0 || $value['diem_chu_tich'] > 10) {
+                    $errors[] = 'Yêu cầu chu tịch phải nhập điểm cho sinh viên '. $value['ten_sinh_vien'] .' và điểm từ 0 - 10!';
+                    $diemIsValid = false;
+                } else {
+                    $diem->diem_chu_tich = $value['diem_chu_tich'];
+                }
+            }
+            else if ($request->vi_tri == 1) {
+                if (!isset($value['diem_thu_ky']) || $value['diem_thu_ky'] < 0 || $value['diem_thu_ky'] > 10) {
+                    $errors[] = 'Yêu cầu thư ký phải nhập điểm cho sinh viên '. $value['ten_sinh_vien'] .' và điểm từ 0 - 10!';
+                    $diemIsValid = false;
+                } else {
+                    $diem->diem_thu_ky = $value['diem_thu_ky'];
+                }
+            }
+            else {
+                if (!isset($value['diem_uy_vien']) || $value['diem_uy_vien'] < 0 || $value['diem_uy_vien'] > 10) {
+                    $errors[] = 'Yêu cầu ủy viên phải nhập điểm cho sinh viên '. $value['ten_sinh_vien'] .' và điểm từ 0 - 10!';
+                    $diemIsValid = false;
+                } else {
+                    $diem->diem_uy_vien = $value['diem_uy_vien'];
+                }
+            }
+            if ($diemIsValid) {
+                $diem->save();
+                $diemSV = Diem::where('id', $value['id_diem'])->first();
+                if ($diemSV->diem_chu_tich != null && $diemSV->diem_thu_ky != null && $diemSV->diem_uy_vien != null) {
+                    $diem_tong = round(((($diemSV->diem_mentor * 0.3) + (($diemSV->diem_chu_tich + $diemSV->diem_thu_ky + $diemSV->diem_uy_vien) / 3) * 0.7)), 2);
+                    $is_done    = DeTaiSinhVien::where('id_nhom', $request->id_nhom)->first();
+                    if ($diem_tong >= 5) {
+                        $diemSV->is_hoan_thanh = 1;
+                        $diemSV->save();
+                        $x = Diem::create([
+                            'id_sinh_vien'  => $diemSV->id_sinh_vien,
+                            'id_casptone'   => 2,
+                        ]);
+
+                    } else {
+                        $diemSV->is_hoan_thanh = 1;
+                        $diemSV->save();
+                        //create
+                        Diem::create([
+                            'id_sinh_vien'  => $diemSV->id_sinh_vien,
+                            'id_casptone'   => 1,
+                        ]);
+                    }
+
+                    $is_done->is_done = 1;
+                    $is_done->save();
+                }
+            }
+
+        }
+
+        if (!empty($errors)) {
+            return response()->json([
+                'status' => 0,
+                'errors' => $errors,
+            ]);
         }
 
         return response()->json([
-            'status'    => 1,
-            'message'   => 'Đã cho điểm thành công!',
+            'status'  => 1,
+            'message' => 'Đã cho điểm thành công!',
         ]);
     }
+
 }

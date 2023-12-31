@@ -6,20 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up()
     {
-        Schema::create('tmp_nhoms', function (Blueprint $table) {
+        Schema::create('ke_hoachs', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_sinh_vien');
-            $table->float('diem_gpa');
-            $table->string('ten_sinh_vien');
+            $table->string('ten_ke_hoach');
+            $table->date('ngay');
+            $table->text('mo_ta');
+            $table->string('file');
+            $table->integer('tinh_trang');
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('tmp_nhoms');
+        Schema::dropIfExists('ke_hoachs');
     }
 };

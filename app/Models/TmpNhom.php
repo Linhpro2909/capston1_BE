@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class TmpNhom extends Model
 {
     use HasFactory;
-    protected $table='tmp_nhoms';
-    protected $fillable=[
+
+    protected $table = "tmp_nhoms";
+    protected $fillable = [
         'id_sinh_vien',
-        'diem_gpa',
-        'ten_sinh_vien',
+        'id_casptone',
+        'id_diem',
     ];
 }

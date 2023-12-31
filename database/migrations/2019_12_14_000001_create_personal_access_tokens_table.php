@@ -13,17 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('nhat_ky_nhoms', function (Blueprint $table) {
+        Schema::create('personal_access_tokens', function (Blueprint $table) {
             $table->id();
-            $table->string('ten_nhat_ky');
-            $table->date('thoi_gian');
-            $table->string('mo_ta');
-            $table->integer('tinh_trang');
-            $table->string('file')->nullable();
-            $table->string('ten_file')->nullable();
-            $table->string('ma_nhom');
-            $table->integer('id_sinh_vien');
-
+            $table->morphs('tokenable');
+            $table->string('name');
+            $table->string('token', 64)->unique();
+            $table->text('abilities')->nullable();
+            $table->timestamp('last_used_at')->nullable();
             $table->timestamps();
         });
     }
@@ -35,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('nhat_ky_nhoms');
+        Schema::dropIfExists('personal_access_tokens');
     }
 };

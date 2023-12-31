@@ -5,15 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Nhom extends Model
+class GuiMail extends Model
 {
     use HasFactory;
-
-    protected $table = "nhoms";
+    protected $table = "gui_mails";
     protected $fillable = [
-        "ten_nhom",
-        "ma_nhom",
-        "id_giang_vien",
-        "id_hoi_dong",
+        "noi_dung_gui",
     ];
 }
