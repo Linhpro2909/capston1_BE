@@ -89,6 +89,7 @@ Route::group(['prefix'  => '/admin'], function () {
         Route::post('/update', [FileController::class, 'updateFile']);
         Route::post('/status', [FileController::class, 'statusKeHoach']);
         Route::post('/delete', [FileController::class, 'delete_plan']);
+        Route::get('/download/{filename}', [FileController::class, 'downloadFile']);
     });
     Route::group(['prefix'  => '/hoi-dong'], function () {
         Route::get('/data-nhom', [HoiDongController::class, 'getDataNhom']);
@@ -109,7 +110,7 @@ Route::group(['prefix' => '/sinh-vien'], function () {
         // Route::get('/get', [NhatKyController::class, 'getDatChiTiet']);
         Route::post('/get-data-nhom-do-an', [NhatKyController::class, 'getNhomDoAn']);
         Route::post('/upload-file', [NhatKyController::class, 'uploadFile']);
-        Route::get('/download/{filename}', [NhatKyController::class, 'downloadFile']);
+        
         Route::post('/delete', [NhatKyController::class, 'deleteNhatKy']);
     });
     Route::group(['prefix' => '/de-tai-sinh-vien'], function () {
